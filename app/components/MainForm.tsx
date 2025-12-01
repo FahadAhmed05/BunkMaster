@@ -9,7 +9,7 @@ export default function MainPage() {
   const [percent, setPercent] = useState<number | null>(null);
   const [allowed, setAllowed] = useState<number | null>(null);
   const [taken, setTaken] = useState<number | null>(null);
-  const [need, setNeed] = useState<number | null>(null);
+  const [need, setNeed] = useState<number | string | null>(null);
   const [status, setStatus] = useState("");
   const [advice, setAdvice] = useState(
     "Result yahan dikhega. Click calculate."
@@ -21,7 +21,7 @@ export default function MainPage() {
   const calc = () => {
     const t = Math.max(0, Math.floor(total));
     const a = Math.max(0, Math.floor(attended));
-    const r = required;
+    const r = Math.min(Math.max(required, 0), 100); // clamp 0-100
 
     if (t === 0) {
       setPercent(null);
@@ -33,25 +33,39 @@ export default function MainPage() {
       return;
     }
 
-    const p = (a / t) * 100;
-    setPercent(Number(p.toFixed(2)));
+    // Current percentage
+    const percentNow = (a / t) * 100;
+    setPercent(Number(percentNow.toFixed(2)));
 
-    const reqAtt = Math.ceil((r / 100) * t);
-    const bunsAllowed = t - reqAtt;
-    const bunsTaken = t - a;
-    const needToReach = Math.max(0, reqAtt - a);
-
+    // Allowed and taken bunks
+    const minRequiredAtt = Math.ceil((r / 100) * t);
+    const bunsAllowed = Math.max(0, t - minRequiredAtt);
+    const bunsTaken = Math.max(0, t - a);
     setAllowed(bunsAllowed);
     setTaken(bunsTaken);
-    setNeed(needToReach);
 
-    if (p >= r) {
+    // Future classes needed (total increases too)
+    let futureNeeded: number | string = 0;
+    if (percentNow >= r) {
+      futureNeeded = 0;
+    } else if (r === 100) {
+      futureNeeded = "Impossible";
+    } else {
+      futureNeeded = Math.ceil(((r / 100) * t - a) / (1 - r / 100));
+      futureNeeded = Math.max(0, futureNeeded);
+    }
+    setNeed(futureNeeded);
+
+    // Status & Advice
+    if (percentNow >= r) {
       setStatus("Safe 😎");
       setAdvice("Aaram se bethe ho, tum required se upar ho.");
     } else {
       setStatus("Shortfall 😬");
       setAdvice(
-        `Required attend karne ke liye ${needToReach} classes attend karni hongi.`
+        futureNeeded === "Impossible"
+          ? "Required 100% hai — attend har class forever tabhi possible."
+          : `Attend at least ${futureNeeded} future class${futureNeeded > 1 ? "es" : ""} to reach ${r}%`
       );
     }
 
@@ -85,21 +99,11 @@ export default function MainPage() {
     <div className="relative min-h-screen flex items-center justify-center p-8 bg-gradient-to-br from-[#ffecd2] to-[#fcb69f] font-sans text-slate-700">
       {/* Floating Emojis */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden select-none z-0">
-        <div className="absolute left-[6%] top-[10%] text-4xl animate-[float_9s_ease-in-out_infinite]">
-          📚
-        </div>
-        <div className="absolute left-[85%] top-[20%] text-4xl animate-[float_11s_ease-in-out_infinite]">
-          😴
-        </div>
-        <div className="absolute left-[20%] top-[70%] text-4xl animate-[float_7s_ease-in-out_infinite]">
-          🚌
-        </div>
-        <div className="absolute left-[70%] top-[78%] text-4xl animate-[float_12s_ease-in-out_infinite]">
-          🎧
-        </div>
-        <div className="absolute left-[45%] top-[3%] text-4xl animate-[float_10s_ease-in-out_infinite]">
-          🤓
-        </div>
+        <div className="absolute left-[6%] top-[10%] text-4xl animate-[float_9s_ease-in-out_infinite]">📚</div>
+        <div className="absolute left-[85%] top-[20%] text-4xl animate-[float_11s_ease-in-out_infinite]">😴</div>
+        <div className="absolute left-[20%] top-[70%] text-4xl animate-[float_7s_ease-in-out_infinite]">🚌</div>
+        <div className="absolute left-[70%] top-[78%] text-4xl animate-[float_12s_ease-in-out_infinite]">🎧</div>
+        <div className="absolute left-[45%] top-[3%] text-4xl animate-[float_10s_ease-in-out_infinite]">🤓</div>
       </div>
 
       {/* Main App */}
@@ -108,14 +112,10 @@ export default function MainPage() {
         <section className="p-9 flex flex-col gap-5 bg-white/70 backdrop-blur">
           {/* Branding */}
           <div className="flex gap-3 items-center">
-            <div className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl shadow-md bg-[conic-gradient(from_160deg,#ffd6a5,#ffadad,#caffbf)]">
-              DU
-            </div>
+            <div className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl shadow-md bg-[conic-gradient(from_160deg,#ffd6a5,#ffadad,#caffbf)]">DU</div>
             <div>
               <h1 className="text-xl font-semibold">DUET Bunk-o-Meter</h1>
-              <p className="text-sm text-slate-500">
-                Type your numbers — aur dekh kitna chill kar sakte ho.
-              </p>
+              <p className="text-sm text-slate-500">Type your numbers — aur dekh kitna chill kar sakte ho.</p>
             </div>
           </div>
 
@@ -183,9 +183,7 @@ export default function MainPage() {
 
             <div className="bg-white/90 p-3 rounded-xl shadow flex-1 min-w-[160px]">
               <strong className="text-sm">Vibe</strong>
-              <p className="text-xs text-slate-500 mt-1">
-                Background emojis float softly in calm rhythm.
-              </p>
+              <p className="text-xs text-slate-500 mt-1">Background emojis float softly in calm rhythm.</p>
             </div>
           </div>
 
