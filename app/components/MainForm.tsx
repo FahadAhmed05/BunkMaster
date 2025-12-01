@@ -17,11 +17,10 @@ export default function MainPage() {
 
   const resultRef = useRef<HTMLDivElement | null>(null);
 
-  // CALCULATE
   const calc = () => {
     const t = Math.max(0, Math.floor(total));
     const a = Math.max(0, Math.floor(attended));
-    const r = Math.min(Math.max(required, 0), 100); // clamp 0-100
+    const r = Math.min(Math.max(required, 0), 100);
 
     if (t === 0) {
       setPercent(null);
@@ -33,18 +32,15 @@ export default function MainPage() {
       return;
     }
 
-    // Current percentage
     const percentNow = (a / t) * 100;
     setPercent(Number(percentNow.toFixed(2)));
 
-    // Allowed and taken bunks
     const minRequiredAtt = Math.ceil((r / 100) * t);
     const bunsAllowed = Math.max(0, t - minRequiredAtt);
     const bunsTaken = Math.max(0, t - a);
     setAllowed(bunsAllowed);
     setTaken(bunsTaken);
 
-    // Future classes needed (total increases too)
     let futureNeeded: number | string = 0;
     if (percentNow >= r) {
       futureNeeded = 0;
@@ -56,7 +52,6 @@ export default function MainPage() {
     }
     setNeed(futureNeeded);
 
-    // Status & Advice
     if (percentNow >= r) {
       setStatus("Safe 😎");
       setAdvice("Aaram se bethe ho, tum required se upar ho.");
@@ -65,24 +60,21 @@ export default function MainPage() {
       setAdvice(
         futureNeeded === "Impossible"
           ? "Required 100% hai — attend har class forever tabhi possible."
-          : `Attend at least ${futureNeeded} future class${futureNeeded > 1 ? "es" : ""} to reach ${r}%`
+          : `Attend at least ${futureNeeded} future class${typeof futureNeeded === "number" && futureNeeded > 1 ? "es" : ""} to reach ${r}%`
       );
     }
 
-    // Scroll to results on mobile
     setTimeout(() => {
       resultRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 150);
   };
 
-  // SAVE TO LOCAL STORAGE
   const saveData = () => {
     const data = { total, attended, required };
     localStorage.setItem("duet-attendance", JSON.stringify(data));
     setAdvice("Saved successfully jaani! 🎉");
   };
 
-  // RESET
   const reset = () => {
     setTotal(40);
     setAttended(30);
@@ -97,7 +89,6 @@ export default function MainPage() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center p-8 bg-gradient-to-br from-[#ffecd2] to-[#fcb69f] font-sans text-slate-700">
-      {/* Floating Emojis */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden select-none z-0">
         <div className="absolute left-[6%] top-[10%] text-4xl animate-[float_9s_ease-in-out_infinite]">📚</div>
         <div className="absolute left-[85%] top-[20%] text-4xl animate-[float_11s_ease-in-out_infinite]">😴</div>
@@ -106,11 +97,8 @@ export default function MainPage() {
         <div className="absolute left-[45%] top-[3%] text-4xl animate-[float_10s_ease-in-out_infinite]">🤓</div>
       </div>
 
-      {/* Main App */}
       <main className="relative z-10 w-full max-w-5xl grid md:grid-cols-2 bg-white/80 rounded-2xl shadow-2xl overflow-hidden">
-        {/* LEFT */}
         <section className="p-9 flex flex-col gap-5 bg-white/70 backdrop-blur">
-          {/* Branding */}
           <div className="flex gap-3 items-center">
             <div className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl shadow-md bg-[conic-gradient(from_160deg,#ffd6a5,#ffadad,#caffbf)]">DU</div>
             <div>
@@ -119,7 +107,6 @@ export default function MainPage() {
             </div>
           </div>
 
-          {/* Inputs */}
           <div className="bg-white/90 p-4 rounded-xl shadow">
             <div className="flex flex-wrap gap-4">
               <div className="flex-1 min-w-[150px]">
@@ -161,7 +148,6 @@ export default function MainPage() {
             </div>
           </div>
 
-          {/* Quick Actions */}
           <div className="flex gap-3 flex-wrap">
             <div className="bg-white/90 p-3 rounded-xl shadow flex-1 min-w-[160px]">
               <strong className="text-sm">Quick Actions</strong>
@@ -193,7 +179,6 @@ export default function MainPage() {
           </div>
         </section>
 
-        {/* RIGHT—RESULTS */}
         <aside
           ref={resultRef}
           className="p-7 bg-white/70 flex flex-col gap-4 text-center md:text-left"
@@ -229,8 +214,7 @@ export default function MainPage() {
           </div>
         </aside>
       </main>
-
-      {/* FLOAT ANIMATION */}
+    
       <style>{`
         @keyframes float {
           0% { transform: translateY(0px) rotate(0deg); opacity: 0.9; }
