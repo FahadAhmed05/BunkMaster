@@ -175,7 +175,7 @@ export default function MainPage() {
 
           <div className="text-xs text-slate-500 mt-auto flex justify-between">
             <span>Made with ☕ & 🎶</span>
-            <span>© Fahad Ahmed</span>
+            <span>© The Anonymous DUETian</span>
           </div>
         </section>
 
