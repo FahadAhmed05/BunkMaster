@@ -15,7 +15,6 @@ export default function MainPage() {
 
   const resultRef = useRef<HTMLDivElement | null>(null);
 
-  /* 📌 AUTO LOAD ON MOUNT */
   useEffect(() => {
     const saved = localStorage.getItem("duet-attendance");
     if (saved) {
@@ -28,7 +27,6 @@ export default function MainPage() {
     }
   }, []);
 
-  /* 💾 AUTO SAVE (Whenever user types) */
   useEffect(() => {
     const timeout = setTimeout(() => {
       const data = { total, attended, required };
@@ -105,7 +103,6 @@ export default function MainPage() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center p-8 bg-gradient-to-br from-[#ffecd2] to-[#fcb69f] font-sans text-slate-700">
-      {/* floating emojis */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden select-none z-0">
         <div className="absolute left-[6%] top-[10%] text-4xl animate-[float_9s_ease-in-out_infinite]">📚</div>
         <div className="absolute left-[85%] top-[20%] text-4xl animate-[float_11s_ease-in-out_infinite]">😴</div>
