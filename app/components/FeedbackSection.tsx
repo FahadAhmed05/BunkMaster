@@ -33,14 +33,14 @@ export default function FeedbackSection() {
   return (
     <section id="feedback" className="w-full mt-20 mb-16 px-4">
       <div className="max-w-xl mx-auto bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-md shadow-xl">
+
         <h2 className="text-2xl font-semibold text-center mb-4">
           Share Your Thoughts
         </h2>
 
         <p className="text-sm text-gray-300 text-center leading-relaxed mb-8">
-          If this little tool added even a hint of ease to your journey, I would be grateful to hear your thoughts.  
-          Tell me what felt missing, what could have been gentler or more helpful.  
-          Your words will quietly guide the next steps, and I’ll do my best to shape this space into something even better for you.
+          If this little tool brought even a breath of ease to your journey,
+          I would be thankful for a few words to help me shape it better for you.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -55,7 +55,7 @@ export default function FeedbackSection() {
           </div>
 
           <div>
-            <label className="text-sm">Your Email</label>
+            <label className="text-sm">Your Email (optional)</label>
             <input
               type="email"
               name="email"
@@ -65,7 +65,7 @@ export default function FeedbackSection() {
           </div>
 
           <div>
-            <label className="text-sm">Your Feedback</label>
+            <label className="text-sm">Your Feedback (required)</label>
             <textarea
               name="message"
               required
@@ -84,11 +84,10 @@ export default function FeedbackSection() {
         </form>
 
         <p className="text-xs text-gray-400 text-center mt-4">
-          Your voice lights the path forward.
+          Your voice softly shapes what comes next.
         </p>
       </div>
 
-      {/* Modal */}
       <ThanksFeedbackModal isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
     </section>
   );

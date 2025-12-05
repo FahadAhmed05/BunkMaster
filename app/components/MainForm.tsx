@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export default function MainPage() {
   const [total, setTotal] = useState(40);
@@ -11,11 +11,31 @@ export default function MainPage() {
   const [taken, setTaken] = useState<number | null>(null);
   const [need, setNeed] = useState<number | string | null>(null);
   const [status, setStatus] = useState("");
-  const [advice, setAdvice] = useState(
-    "Result yahan dikhega. Click calculate."
-  );
+  const [advice, setAdvice] = useState("Result yahan dikhega. Click calculate.");
 
   const resultRef = useRef<HTMLDivElement | null>(null);
+
+  /* 📌 AUTO LOAD ON MOUNT */
+  useEffect(() => {
+    const saved = localStorage.getItem("duet-attendance");
+    if (saved) {
+      const data = JSON.parse(saved);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setTotal(data.total);
+      setAttended(data.attended);
+      setRequired(data.required);
+      setAdvice("Welcome back — I remembered your last numbers.");
+    }
+  }, []);
+
+  /* 💾 AUTO SAVE (Whenever user types) */
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      const data = { total, attended, required };
+      localStorage.setItem("duet-attendance", JSON.stringify(data));
+    }, 1500);
+    return () => clearTimeout(timeout);
+  }, [total, attended, required]);
 
   const calc = () => {
     const t = Math.max(0, Math.floor(total));
@@ -60,19 +80,15 @@ export default function MainPage() {
       setAdvice(
         futureNeeded === "Impossible"
           ? "Required 100% hai — attend har class forever tabhi possible."
-          : `Attend at least ${futureNeeded} future class${typeof futureNeeded === "number" && futureNeeded > 1 ? "es" : ""} to reach ${r}%`
+          : `Attend at least ${futureNeeded} future class${
+              typeof futureNeeded === "number" && futureNeeded > 1 ? "es" : ""
+            } to reach ${r}%`
       );
     }
 
     setTimeout(() => {
       resultRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 150);
-  };
-
-  const saveData = () => {
-    const data = { total, attended, required };
-    localStorage.setItem("duet-attendance", JSON.stringify(data));
-    setAdvice("Saved successfully jaani! 🎉");
   };
 
   const reset = () => {
@@ -89,6 +105,7 @@ export default function MainPage() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center p-8 bg-gradient-to-br from-[#ffecd2] to-[#fcb69f] font-sans text-slate-700">
+      {/* floating emojis */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden select-none z-0">
         <div className="absolute left-[6%] top-[10%] text-4xl animate-[float_9s_ease-in-out_infinite]">📚</div>
         <div className="absolute left-[85%] top-[20%] text-4xl animate-[float_11s_ease-in-out_infinite]">😴</div>
@@ -100,10 +117,14 @@ export default function MainPage() {
       <main className="relative z-10 w-full max-w-5xl grid md:grid-cols-2 bg-white/80 rounded-2xl shadow-2xl overflow-hidden">
         <section className="p-9 flex flex-col gap-5 bg-white/70 backdrop-blur">
           <div className="flex gap-3 items-center">
-            <div className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl shadow-md bg-[conic-gradient(from_160deg,#ffd6a5,#ffadad,#caffbf)]">DU</div>
+            <div className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl shadow-md bg-[conic-gradient(from_160deg,#ffd6a5,#ffadad,#caffbf)]">
+              DU
+            </div>
             <div>
               <h1 className="text-xl font-semibold">DUET Bunk-o-Meter</h1>
-              <p className="text-sm text-slate-500">Type your numbers — aur dekh kitna chill kar sakte ho.</p>
+              <p className="text-sm text-slate-500">
+                Type your numbers — and see how much ease you can enjoy.
+              </p>
             </div>
           </div>
 
@@ -153,12 +174,6 @@ export default function MainPage() {
               <strong className="text-sm">Quick Actions</strong>
               <div className="flex mt-2 gap-2">
                 <button
-                  onClick={saveData}
-                  className="px-4 py-1.5 bg-rose-400 text-white rounded-lg shadow cursor-pointer"
-                >
-                  Save
-                </button>
-                <button
                   onClick={reset}
                   className="px-4 py-1.5 bg-blue-400 text-white rounded-lg shadow cursor-pointer"
                 >
@@ -168,8 +183,10 @@ export default function MainPage() {
             </div>
 
             <div className="bg-white/90 p-3 rounded-xl shadow flex-1 min-w-[160px]">
-              <strong className="text-sm">Vibe</strong>
-              <p className="text-xs text-slate-500 mt-1">Background emojis float softly in calm rhythm.</p>
+              <strong className="text-sm">Essence</strong>
+              <p className="text-xs text-slate-500 mt-1">
+                “Where simplicity leaves room to breathe.”
+              </p>
             </div>
           </div>
 
@@ -214,7 +231,7 @@ export default function MainPage() {
           </div>
         </aside>
       </main>
-    
+
       <style>{`
         @keyframes float {
           0% { transform: translateY(0px) rotate(0deg); opacity: 0.9; }
